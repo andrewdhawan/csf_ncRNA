@@ -15,6 +15,7 @@ library(RColorBrewer)
 library(pals)
 library(ggridges)
 library(ggpubr)
+library(effectsize)
 
 #load the datasets that we have cleaned and harmonized
 # setwd("~/Google Drive/ResearchProjects/CSF_ncRNA")
@@ -201,6 +202,17 @@ dev.off()
 #========================================================================================================
 
 
+#check correlation between nanostring dataset and non-nanostring datasets for healthy controls after batch correcting data
+all_healthy = rownames(pheno)[which(pheno[,'disease_status'] =='Healthy')]
+healthy_drusco = rownames(pheno)[which(pheno[colnames(clinical_data_list$Drusco_2015),'disease_status'] =='Healthy')]
+all_healthy_non_drusco = setdiff(all_healthy, healthy_drusco)
+
+#for every miR, we take the geometric mean of the batch corrected expression in non-nanostring data and in nanostring data
+#then we compare correlation between the values for nanostring and non-nanostring data
+
+print(cor.test(rowMeans(combat_edata[,healthy_drusco]), rowMeans(combat_edata[,all_healthy_non_drusco]),method='spearman'))
+
+#=========================================================================================================
 #now, let's perform differential miRNA expression analysis using Wilcoxon across diseases
 healthy_pts = rownames(pheno)[which(pheno$disease_status == 'Healthy')]
 
@@ -258,20 +270,67 @@ ggboxplot(melted_df[which(melted_df$Var1 == 'hsa-miR-767-5p' & (melted_df$diseas
 dev.copy(pdf,file='healthy_ad_mir767.pdf',width=3,height=4)
 dev.off()
 
+cohens_d(
+	x= 'value',
+y = 'disease_name',
+data = melted_df[which(melted_df$Var1 == 'hsa-miR-767-5p' & (melted_df$disease_name %in% c('AD','Healthy'))),],
+correction = FALSE,
+pooled_sd = TRUE,
+paired = FALSE,
+ci = 0.95
+)
+
+
 dev.new()
 ggboxplot(melted_df[which(melted_df$Var1 == 'hsa-miR-361-3p' & (melted_df$disease_name %in% c('HD','Healthy'))),],x='disease_name',y='value',color='black',palette='npj',add='jitter',add.params=list(alpha=0.2),xlab='',ylab='',alpha=0.2,title='hsa-miR-361-3p') + rotate_x_text(angle=30)+  stat_compare_means()  
 dev.copy(pdf,file='healthy_hd_mir361.pdf',width=3,height=4)
 dev.off()
+
+
+cohens_d(
+	x= 'value',
+y = 'disease_name',
+data = melted_df[which(melted_df$Var1 == 'hsa-miR-361-3p' & (melted_df$disease_name %in% c('HD','Healthy'))),],
+correction = FALSE,
+pooled_sd = TRUE,
+paired = FALSE,
+ci = 0.95
+)
+
 
 dev.new()
 ggboxplot(melted_df[which(melted_df$Var1 == 'hsa-miR-885-5p' & (melted_df$disease_name %in% c('HD-Pre-Low','Healthy'))),],x='disease_name',y='value',color='black',palette='npj',add='jitter',add.params=list(alpha=0.2),xlab='',ylab='',alpha=0.2,title='hsa-miR-885-5p') +  rotate_x_text(angle=30)+ stat_compare_means()  
 dev.copy(pdf,file='healthy_hd_pre_low_mir885.pdf',width=3,height=4)
 dev.off()
 
+
+cohens_d(
+	x= 'value',
+y = 'disease_name',
+data = melted_df[which(melted_df$Var1 == 'hsa-miR-885-5p' & (melted_df$disease_name %in% c('HD-Pre-Low','Healthy'))),],
+correction = FALSE,
+pooled_sd = TRUE,
+paired = FALSE,
+ci = 0.95
+)
+
+
 dev.new()
 ggboxplot(melted_df[which(melted_df$Var1 == 'hsa-miR-142-5p' & (melted_df$disease_name %in% c('ALS','Healthy'))),],x='disease_name',y='value',color='black',palette='npj',add='jitter',add.params=list(alpha=0.2),xlab='',ylab='',alpha=0.2,title='hsa-miR-142-5p') + rotate_x_text(angle=30)+  stat_compare_means()  
 dev.copy(pdf,file='healthy_als_mir142.pdf',width=3,height=4)
 dev.off()
+
+
+
+cohens_d(
+	x= 'value',
+y = 'disease_name',
+data = melted_df[which(melted_df$Var1 == 'hsa-miR-142-5p' & (melted_df$disease_name %in% c('ALS','Healthy'))),],
+correction = FALSE,
+pooled_sd = TRUE,
+paired = FALSE,
+ci = 0.95
+)
 
 
 dev.new()
@@ -282,6 +341,26 @@ dev.copy(pdf,file='healthy_degenerative_mir142_mir361.pdf',width=6,height=4)
 dev.off()
 
 
+cohens_d(
+	x= 'value',
+y = 'disease_name_simplified',
+data = melted_df[which(melted_df$Var1 == 'hsa-miR-142-5p' & (melted_df$disease_name_simplified %in% c('Degenerative','Healthy'))),],
+correction = FALSE,
+pooled_sd = TRUE,
+paired = FALSE,
+ci = 0.95
+)
+
+
+cohens_d(
+	x= 'value',
+y = 'disease_name_simplified',
+data = melted_df[which(melted_df$Var1 == 'hsa-miR-361-3p' & (melted_df$disease_name_simplified %in% c('Degenerative','Healthy'))),],
+correction = FALSE,
+pooled_sd = TRUE,
+paired = FALSE,
+ci = 0.95
+)
 #=====================================================================================================
 
 #-----Here, we identify the miRNA that are highly expressed consistently in the healthy state.
